@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sliver_list_example/list_item.dart';
+import 'package:sliver_list_example/shimmer_effect.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,7 +36,6 @@ class _ListPageState extends State<ListPage> {
   late int _seed;
   int _itemCount = 10;
   bool _isLoading = false;
-  double _offset = 0;
 
   @override
   void initState() {
@@ -77,38 +77,35 @@ class _ListPageState extends State<ListPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Column(
-          children: [
-            Expanded(
-              child: CustomScrollView(controller: _scrollController, slivers: [
-                const SliverAppBar(
-                  floating: true,
-                  snap: true,
-                  title: Text("Sliver List Example"),
-                ),
-                CupertinoSliverRefreshControl(
-                  onRefresh: () async {
-                    //Sets new random seed value for the image list
-                    await Future<void>.delayed(
-                        const Duration(
-                          milliseconds: 300,
-                        ), () {
-                      setState(() {
-                        _seed = Random().nextInt(100);
-                      });
-                    });
-                  },
-                ),
-                SliverList.builder(
-                    itemCount: _itemCount,
-                    itemBuilder: (context, index) {
-                      return ListItem(
-                          imageUrl:
-                              "https://picsum.photos/seed/${_seed + index}/1000/1000");
-                    }),
-              ]),
+        body: Shimmer(
+          linearGradient: shimmerGradient,
+          child: CustomScrollView(controller: _scrollController, slivers: [
+            const SliverAppBar(
+              floating: true,
+              snap: true,
+              title: Text("Sliver List Example"),
             ),
-          ],
+            CupertinoSliverRefreshControl(
+              onRefresh: () async {
+                //Sets new random seed value for the image list
+                await Future<void>.delayed(
+                    const Duration(
+                      milliseconds: 300,
+                    ), () {
+                  setState(() {
+                    _seed = Random().nextInt(100);
+                  });
+                });
+              },
+            ),
+            SliverList.builder(
+                itemCount: _itemCount,
+                itemBuilder: (context, index) {
+                  return ListItem(
+                      imageUrl:
+                          "https://picsum.photos/seed/${_seed + index}/1000/1000");
+                }),
+          ]),
         ),
       ),
     );
