@@ -1,3 +1,6 @@
+
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 const shimmerGradient = LinearGradient(
@@ -52,13 +55,13 @@ class ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
   }
 
   LinearGradient get gradient => LinearGradient(
-    colors: widget.linearGradient.colors,
-    stops: widget.linearGradient.stops,
-    begin: widget.linearGradient.begin,
-    end: widget.linearGradient.end,
-    transform:
-    _SlidingGradientTransform(slidePercent: _shimmerController.value),
-  );
+        colors: widget.linearGradient.colors,
+        stops: widget.linearGradient.stops,
+        begin: widget.linearGradient.begin,
+        end: widget.linearGradient.end,
+        transform:
+            _SlidingGradientTransform(slidePercent: _shimmerController.value),
+      );
 
   bool get isSized =>
       (context.findRenderObject() as RenderBox?)?.hasSize ?? false;
@@ -97,11 +100,9 @@ class _SlidingGradientTransform extends GradientTransform {
 class ShimmerLoading extends StatefulWidget {
   const ShimmerLoading({
     super.key,
-    required this.isLoading,
     required this.child,
   });
 
-  final bool isLoading;
   final Widget child;
 
   @override
@@ -114,12 +115,11 @@ class _ShimmerLoadingState extends State<ShimmerLoading> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_shimmerChanges != null) {
-      _shimmerChanges!.removeListener(_onShimmerChange);
-    }
-    _shimmerChanges = Shimmer.of(context)?.shimmerChanges;
-    if (_shimmerChanges != null) {
-      _shimmerChanges!.addListener(_onShimmerChange);
+      _shimmerChanges?.removeListener(_onShimmerChange);
+      _shimmerChanges = Shimmer.of(context)?.shimmerChanges;
+      if (_shimmerChanges != null) {
+        _shimmerChanges!.addListener(_onShimmerChange);
+
     }
   }
 
@@ -130,18 +130,12 @@ class _ShimmerLoadingState extends State<ShimmerLoading> {
   }
 
   void _onShimmerChange() {
-    if (widget.isLoading) {
       setState(() {
-        // update the shimmer painting.
       });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.isLoading) {
-      return widget.child;
-    }
 
     // Collect ancestor shimmer info.
     final shimmer = Shimmer.of(context)!;
@@ -152,6 +146,9 @@ class _ShimmerLoadingState extends State<ShimmerLoading> {
     }
     final shimmerSize = shimmer.size;
     final gradient = shimmer.gradient;
+    if(context.findRenderObject() == null){
+      return const SizedBox();
+    }
     final offsetWithinShimmer = shimmer.getDescendantOffset(
       descendant: context.findRenderObject() as RenderBox,
     );

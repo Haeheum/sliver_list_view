@@ -1,63 +1,54 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:sliver_list_example/shimmer_effect.dart';
 
 class ListItem extends StatefulWidget {
-  ListItem({Key? key, required this.imageUrl}) : super(key: key);
+  const ListItem({Key? key, required this.imageUrl}) : super(key: key);
 
   final String imageUrl;
-
-  final GlobalKey backgroundImageKey = GlobalKey();
 
   @override
   State<ListItem> createState() => _ListItemState();
 }
 
 class _ListItemState extends State<ListItem> {
-  bool _isLoading = true;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    precacheImage(Image.network(widget.imageUrl).image, context);
-  }
+  GlobalKey backgroundImageKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: ShimmerLoading(
-        isLoading: _isLoading,
-        child: AspectRatio(
-          aspectRatio: 16 / 9,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Flow(
-              delegate: ParallaxFlowDelegate(
-                scrollable: Scrollable.of(context),
-                listItemContext: context,
-                backgroundImageKey: widget.backgroundImageKey,
-              ),
-              children: [
-                Image.network(
-                  widget.imageUrl,
-                  key: widget.backgroundImageKey,
-                  fit: BoxFit.cover,
-                  frameBuilder: (_, child, frame, __) {
-                    if (frame == 0) {
-                      if (_isLoading == true) {
-                        WidgetsBinding.instance
-                            .addPostFrameCallback((timeStamp) {
-                          setState(() {
-                            _isLoading = false;
-                          });
-                        });
-                      }
-                    }
-                    return child;
-                  },
-                ),
-              ],
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Flow(
+            delegate: ParallaxFlowDelegate(
+              scrollable: Scrollable.of(context),
+              listItemContext: context,
+              backgroundImageKey: backgroundImageKey,
             ),
+            children: [
+              Image.network(
+                widget.imageUrl,
+                key: backgroundImageKey,
+                fit: BoxFit.cover,
+                frameBuilder: (_, child, frame, ____) {
+                  if (frame == 0) {
+                    return child;
+                  } else {
+                    return ShimmerLoading(
+                      child: Container(
+                        color: Colors.grey,
+                        height: 500,
+                        width: 500,
+                      ),
+                    );
+                  }
+                },
+              ),
+            ],
           ),
         ),
       ),

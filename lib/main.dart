@@ -1,4 +1,5 @@
-import 'dart:math';
+import 'dart:math' as math;
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -31,28 +32,25 @@ class ListPage extends StatefulWidget {
 }
 
 class _ListPageState extends State<ListPage> {
-  final ScrollController _scrollController = ScrollController();
+  late final ScrollController _scrollController = ScrollController();
 
-  late int _seed;
+  late int _seed = math.Random().nextInt(100);
   int _itemCount = 10;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    //Sets random seed value for the image list
-    _seed = Random().nextInt(100);
-
+    log(name: "initState", "New seed : $_seed");
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _scrollController.addListener(() {
-        setState(() {});
-        if (_scrollController.position.extentAfter < 250 && !_isLoading) {
+
+        if (_scrollController.position.extentAfter < 350 && !_isLoading) {
           _loadData();
         }
       });
     });
   }
-
 
   @override
   void dispose() {
@@ -60,15 +58,13 @@ class _ListPageState extends State<ListPage> {
     super.dispose();
   }
 
-  _loadData() async {
+  _loadData() {
     if (_isLoading == false) {
       _isLoading = true;
-      debugPrint("Loading data...");
       setState(() {
-        _itemCount += 3;
-        debugPrint("Item count: $_itemCount");
+        _itemCount += 10;
         _isLoading = false;
-        debugPrint("Load complete!");
+        log(name: "onLoadData", "New item count: $_itemCount");
       });
     }
   }
@@ -93,7 +89,9 @@ class _ListPageState extends State<ListPage> {
                       milliseconds: 300,
                     ), () {
                   setState(() {
-                    _seed = Random().nextInt(100);
+                    _itemCount = 10;
+                    _seed = math.Random().nextInt(100);
+                    log(name: "onRefresh", "New seed : $_seed");
                   });
                 });
               },
@@ -101,9 +99,10 @@ class _ListPageState extends State<ListPage> {
             SliverList.builder(
                 itemCount: _itemCount,
                 itemBuilder: (context, index) {
+                  log(name: "OnLoadData", "Building item: $index/$_itemCount");
                   return ListItem(
                       imageUrl:
-                          "https://picsum.photos/seed/${_seed + index}/1000/1000");
+                          "https://picsum.photos/seed/${_seed + index}/500/600");
                 }),
           ]),
         ),
@@ -113,5 +112,5 @@ class _ListPageState extends State<ListPage> {
 }
 
 Color randomColor() {
-  return Color(0xFFFFFFFF & Random().nextInt(0xFFFFFFFF));
+  return Color(0xFFFFFFFF & math.Random().nextInt(0xFFFFFFFF));
 }
