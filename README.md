@@ -1,5 +1,5 @@
 # sliver_list_example
 Infinite loading Sliver list example with shimmer and parallax effect.
 
-## Getting Started
+## Preview
 ![til](./preview.gif)
